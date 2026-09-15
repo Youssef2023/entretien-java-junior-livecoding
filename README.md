@@ -11,19 +11,37 @@ Votre mission : la faire fonctionner, puis la faire évoluer.
 
 ## Ce dont vous avez besoin
 
-- **Java 17** (`java -version` pour vérifier)
+- **Java 17 ou plus récent** — c'est le seul vrai prérequis
 - Maven : inutile de l'installer, le wrapper est fourni
 - Votre IDE habituel
+
+**Attention** : Maven utilise la variable `JAVA_HOME`, pas forcément le `java` de votre
+PATH. Si vous avez plusieurs JDK installés, vérifiez celui-là :
+
+```bash
+# Linux / macOS
+echo $JAVA_HOME && $JAVA_HOME/bin/java -version
+```
+
+```powershell
+# Windows PowerShell
+$env:JAVA_HOME ; & "$env:JAVA_HOME\bin\java.exe" -version
+```
 
 ## Démarrer l'application
 
 ```bash
+# Linux / macOS
 ./mvnw spring-boot:run
 ```
 
-Sous Windows, en `cmd` ou PowerShell :
+```powershell
+# Windows PowerShell — le .\ est obligatoire
+.\mvnw.cmd spring-boot:run
+```
 
 ```bash
+:: Windows cmd.exe
 mvnw.cmd spring-boot:run
 ```
 
@@ -79,6 +97,39 @@ méthode.
 
 ## En cas de problème
 
-Si l'application ne démarre pas du tout pour une raison d'environnement (version de Java,
-proxy, téléchargement Maven), signalez-le immédiatement : c'est notre problème, pas le
-vôtre, et on vous débloque.
+### « class file has wrong version 61.0, should be 52.0 »
+
+C'est l'erreur la plus fréquente : **Maven tourne avec un JDK trop ancien**. Le `61.0` est
+la version attendue (Java 17), le `52.0` celle de votre JDK actuel (Java 8).
+
+Corrigez le temps de la session, sans rien installer :
+
+```powershell
+# Windows PowerShell — adaptez le chemin a votre JDK 17
+$env:JAVA_HOME = "C:\chemin\vers\jdk-17"
+.\mvnw.cmd spring-boot:run
+```
+
+```bash
+# Linux / macOS
+export JAVA_HOME=/chemin/vers/jdk-17
+./mvnw spring-boot:run
+```
+
+**Dans IntelliJ**, deux réglages sont nécessaires, pas un :
+
+1. *File → Project Structure → Project* → **SDK** : votre JDK 17
+2. *Settings → Build Tools → Maven → Runner* → **JRE** : votre JDK 17
+
+Le second est celui qu'on oublie : l'IDE peut indexer en 17 tout en lançant Maven en 8.
+
+### « mvnw.cmd n'est pas reconnu » sous PowerShell
+
+PowerShell n'exécute pas un fichier du dossier courant sans préfixe. Écrivez
+`.\mvnw.cmd` et non `mvnw.cmd`.
+
+### Autre chose
+
+Si l'application ne démarre pas pour une raison d'environnement (proxy qui bloque le
+téléchargement Maven, port 8080 déjà occupé), signalez-le immédiatement : c'est notre
+problème, pas le vôtre, et on vous débloque.
